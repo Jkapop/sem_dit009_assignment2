@@ -7,7 +7,7 @@ def retrieve_release_history(id, artist_nr):
     url = f"https://dit009-spotify-assignment.vercel.app/api/v1{songs}"
     response = requests.get(url)
     spotify_data = response.json()
-    filename = "./release_history_"+artist_nr+".json"
+    filename = "./resources/release_history_"+artist_nr+".json"
     with open(filename, 'w') as file:
         json.dump(spotify_data, file)
     return spotify_data
@@ -17,7 +17,7 @@ def retrieve_top_tracks(artist_nr, artist_id):
     top_url = "https://dit009-spotify-assignment.vercel.app/api/v1/artists/"+artist_id+"/top-tracks" 
     top_response = requests.get(top_url)
     top_data = top_response.json()
-    filename = "./top_"+artist_nr+".json"
+    filename = "./resources/top_"+artist_nr+".json"
     with open(filename, 'w') as file:
         json.dump(top_data, file)
     return top_data
@@ -26,7 +26,7 @@ def retrieve_charts():
     url = f"https://dit009-spotify-assignment.vercel.app/api/v1/playlists/37i9dQZEVXbNG2KDcFcKOF"
     response = requests.get(url)
     spotify_data = response.json()
-    with open("./charts.json", 'w') as file:
+    with open("./resources/charts.json", 'w') as file:
         json.dump(spotify_data, file)
     return spotify_data
 
@@ -37,7 +37,7 @@ def retrieve_audio_features(id_list, artist_nr):
         features_url += id + "%2C"
     features_response = requests.get(features_url)
     features_data = features_response.json()
-    filename = "./features_"+str(artist_nr)+".json"
+    filename = "./resources/features_"+str(artist_nr)+".json"
     with open(filename, 'w') as file:
         json.dump(features_data, file)
     return features_data
@@ -56,7 +56,8 @@ def retrieve_artist_id(name):
     id_response = requests.get(search_url)
     id_data = id_response.json()     
     id = id_data['artists']['items'][0]['id']
-    return id
+    actual_name = id_data['artists']['items'][0]['name']
+    return id, actual_name
 
 # Lyrics API: Get lyrics for a song (based on artist name and title)
 def retrieve_lyrics(artist_name, track):
