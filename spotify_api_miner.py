@@ -9,7 +9,7 @@ def retrieve_release_history(id, artist_nr):
     spotify_data = response.json()
     filename = "./resources/release_history_"+artist_nr+".json"
     with open(filename, 'w') as file:
-        json.dump(spotify_data, file)
+        json.dump(spotify_data, file, indent=4)
     return spotify_data
 
 # Get the Top 10 tracks of an artist (based on asrtist ID)
@@ -19,7 +19,7 @@ def retrieve_top_tracks(artist_nr, artist_id):
     top_data = top_response.json()
     filename = "./resources/top_"+artist_nr+".json"
     with open(filename, 'w') as file:
-        json.dump(top_data, file)
+        json.dump(top_data, file, indent=4)
     return top_data
 
 def retrieve_charts():
@@ -27,7 +27,7 @@ def retrieve_charts():
     response = requests.get(url)
     spotify_data = response.json()
     with open("./resources/charts.json", 'w') as file:
-        json.dump(spotify_data, file)
+        json.dump(spotify_data, file, indent=4)
     return spotify_data
 
 # Get the audio features (danceability,...) for a list of songs (based on song IDs)
@@ -39,7 +39,7 @@ def retrieve_audio_features(id_list, artist_nr):
     features_data = features_response.json()
     filename = "./resources/features_"+str(artist_nr)+".json"
     with open(filename, 'w') as file:
-        json.dump(features_data, file)
+        json.dump(features_data, file, indent=4)
     return features_data
 
 # Use Spotify's search function to get the ID for an artist (based on user input for artist name)

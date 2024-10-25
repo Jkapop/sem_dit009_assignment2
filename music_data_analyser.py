@@ -4,12 +4,13 @@ import re
 import requests
 import json
 from spotify_api_miner import *
+import wikipedia_api_miner
 import time
 
 # Print imported artists
 def print_artists(artists):
     print("-----------------------------------------------")
-    print(f"{"Artist Nr.":<10}{"Artist Name":>30}")
+    print(f"{'Artist Nr.':<10}{'Artist Name':>30}")
     print("-----------------------------------------------")
     for nr, name in artists.items():
         print(f"{nr:<10}{name[0]:>30}")
@@ -18,7 +19,7 @@ def print_artists(artists):
 # Load a dictionary containing the top 10 songs from an artist from a .json file
 def get_top(artist_nr):  
     try:
-        filename = "./resources/top_"+artist_nr+".json"
+        filename = "resources/top_"+artist_nr+".json"
         with open(filename, 'r') as file:
             top_data = json.load(file)
         return top_data
@@ -28,7 +29,7 @@ def get_top(artist_nr):
 # Get charts:
 def get_charts():
     try: # Check whether charts.json is in directory
-        with open("./resources/charts.json", 'r') as file:
+        with open("resources/charts.json", 'r') as file:
             charts = json.load(file)
         return charts
     except: # If file is not in directory: Retrieve it through API
@@ -41,7 +42,7 @@ def get_charts():
 
 def get_charts_features():
     try:    
-        with open("./resources/features_charts.json", 'r')as file:
+        with open("resources/features_charts.json", 'r')as file:
             audio_features = json.load(file)
         return audio_features
     except:
@@ -58,14 +59,14 @@ def get_charts_features():
 
 # Load the song features (danceability,...) of a list of songs from .json file or API
 def get_features(artist_nr):       
-    filename = "./resources/features_"+artist_nr+".json"
+    filename = "resources/features_"+artist_nr+".json"
     with open(filename, 'r')as file:
         audio_features = json.load(file)
     return audio_features
  
 
 def get_release_history(artist_nr):    
-    filename = "./resources/release_history_"+artist_nr+".json"
+    filename = "resources/release_history_"+artist_nr+".json"
     with open(filename, 'r')as file:
         audio_features = json.load(file)
     return audio_features
@@ -92,7 +93,7 @@ def plot_release_history(dates, name) :
     plt.xlabel('Year')
     plt.ylabel('Release count')
     filename = f"{name.lower()}_release_history.png"
-    plt.savefig("./resources/"+filename)
+    plt.savefig("resources/"+filename)
     plt.show()
 
 def get_release_dates_of_artist(data) :
@@ -119,6 +120,7 @@ def get_explicit_top(data):
 
 def are_lyrics_personal(artist_dict, artist_nr) :
     artist_name = artist_dict[artist_nr][0]
+    print("Let's analyze their lyrics!")
     track = input("Please input one of their songs: ")
     try:
         lyr_response = retrieve_lyrics(artist_name, track)
@@ -153,7 +155,7 @@ def are_lyrics_personal(artist_dict, artist_nr) :
         buckets = [len(me_list), len(you_list), len(they_list)]
         plt.bar(["I", "You", "They"], buckets)
         filename = f"{track}_lyrics.png"
-        plt.savefig("./resources/"+filename)
+        plt.savefig("resources/" + filename)
         plt.show()
 
 # Compare the average duration of top 10 songs from two artists
@@ -191,10 +193,10 @@ def compare_duration_artists(artist_nr_1, artist_nr_2, artists_dict):
 
     if mean_duration_1 > mean_duration_2:
         difference = mean_duration_1 - mean_duration_2
-        print(f"{artist_name_1}'s songs are on average {difference} seconds longer")
+        print(f"{artist_name_1}'s songs are on average {difference} seconds longer.")
     elif mean_duration_1 < mean_duration_2:
         difference = mean_duration_2 - mean_duration_1
-        print(f"{artist_name_2}'s songs are on average {difference} seconds longer")
+        print(f"{artist_name_2}'s songs are on average {difference} seconds longer.")
     else: print(f"The songs of {artist_name_1} and {artist_name_2} have on average the same duration!")
 
 def compare_duration_charts(artist_nr, artists_dict):
@@ -278,7 +280,7 @@ def main() :
     # keys -> artist numbers (starting at 1)
     # values -> list with Name of Artist (index:[0]) and ID of artist (index:[1])
     try:
-        with open("./resources/artists.json", 'r')as file:
+        with open("resources/artists.json", 'r')as file:
             artists = json.load(file)
     except: artists = {"1": ["Lady Gaga", "1HY2Jd0NmPuamShAr6KMms"], "2": ["Porcupine Tree", "5NXHXK6hOCotCF8lvGM1I0"]}
     
@@ -287,7 +289,7 @@ def main() :
     Type "exit" to leave program (and to save added artists for future use)
     Type 0 to show list of artists
     Type 1 to plot the release history of an artist.
-    Type 2 to check how personal a song's lyrics are. (add wikipedia API?)
+    Type 2 to learn about artist's wikipedia data and analyze their lyrics.
     Type 3 to compare an artist to another artist or the charts.
     Type x to add an artist (requires internet connection and takes up to 50 seconds)
 """
@@ -307,14 +309,16 @@ def main() :
                         spotify_data = get_release_history(artist_nr)
                         release_dates = get_release_dates_of_artist(spotify_data)
                         plot_release_history(release_dates, artists[artist_nr][0])
-                    except: print("An error occured. Check your internet connection.")
+                    except: 
+                        print("An error occured. Check your internet connection.")
                 else:
                     print("Artist number not available. Try again.")
 
             case "2" : # how personal lyrics are 
-                #Add wikipedia API here 
+                #Add wikipedia API here
                 print_artists(artists)
                 artist_nr = input("Artist Nr: ")
+                wikipedia_api_miner.print_wiki_info_text(artists[artist_nr][0])
                 are_lyrics_personal(artists, artist_nr)
 
             case "3" : # Comparing artists  
@@ -404,14 +408,14 @@ def main() :
                     for song in top_tracks['tracks']:
                         id_list.append(song['id'])
                     print("Wait 30 seconds - due to limited requests to spotfy API")
-                    time.sleep(30)
+                    time.sleep(30) 
                     retrieve_audio_features(id_list, new_key)
                     artists.update({new_key : [actual_name, id]})
                 except: 
                     print("An error occured. Check your internet connection.")
 
             case "exit" :
-                with open("./resources/artists.json", 'w') as file:
+                with open("resources/artists.json", 'w') as file:
                     json.dump(artists, file)
                 print("bye bye!")
             
