@@ -1,7 +1,8 @@
-*.json
+
 *.env
 *.jpg
 *.png
 *.pdf
 *.txt
+*.DS_Store
 __pycache__/

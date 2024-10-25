@@ -71,7 +71,7 @@ def retrieve_lyrics(artist_name, track):
 
 # Wikipedia API: views of article
 def retrieve_wikipage_views_month(search_title, print_errors = True):
-    search_title = search_title.replace(" ", "_")  # Use underscores for Wikipedia titles
+    search_title = search_title.replace(" ", "_")
     date_today = datetime.datetime.today()
     formatted_date_today = date_today.strftime('%Y%m%d')
     date_30_days_ago = date_today - datetime.timedelta(days=30)
@@ -83,17 +83,11 @@ def retrieve_wikipage_views_month(search_title, print_errors = True):
     if response.status_code == 404:
         if print_errors == True: print(f"Error! Artist not found. Check spelling and try again.")
         return
-
     try:
         wikipedia_view_data = response.json()
- 
     except:
         print("An error occured, please try again.")
         return
-
-    filename = f"resources/wikipedia/{search_title}_wikipedia_page_views_{formatted_date_today}.json"
-    with open(filename, "w") as file:
-        json.dump(wikipedia_view_data, file, indent=4)
 
     return wikipedia_view_data
 
@@ -108,10 +102,8 @@ def retrieve_wikipage_info(search_title):
     clean_text = re.sub(r'&lt;.*?&gt;|<.*?>', '', html_content)
     clean_text = clean_text.replace("HTML may be malformed and/or unbalanced and may omit inline images. Use at your own risk. Known problems are listed at https://www.mediawiki.org/wiki/Special:MyLanguage/Extension:TextExtracts#Caveats.\n", "")
 
-    with open(f"resources/wikipedia/{search_title.replace(" ", "_")}_wikitext.txt", "w", encoding="utf-8") as file:
-        file.write(clean_text)
-
     number_words = len(clean_text.split(" "))
+
     info_dict = {}
     info_dict["total_words"] = number_words
     info_dict["reading_time"] = round(number_words / 280, 2)
